@@ -1,0 +1,12 @@
+{
+  "name": "natgeomongoscraper",
+  "version": "1.0.0",
+  "description": "full-stack web app which scrapes natGeo stories with cheerio.js into a mongoDB using mongoose.js",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Candice Schramm - email: candiceschramm@gmail.com - linkedIn: https://www.linkedin.com/in/candice-schramm-8934426a/",
+  "license": "ISC"
+}
