@@ -13,6 +13,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 //set up morgan to log http requests
 app.use(logger("dev"));
 
+//routes
+require("./routes/htmlRoutes")(app);
+require("./routes/apiRoutes")(app, db);
+
 //public files
 app.use(express.static("public"));
 
@@ -24,12 +28,14 @@ app.engine(
     })
 )
 app.set("view engine", "handlebars")
-
-//routes
-require("./routes/htmlRoutes")(app);
-require("./routes/apiRoutes")(app);
+//set up connection to DB
 
 mongoose.connect("mongodb://localhost/natGeoScraper", {useNewUrlParser: true})
+var db = require("./models");
+
+
+
+
 
 
 app.listen(PORT, () => {
