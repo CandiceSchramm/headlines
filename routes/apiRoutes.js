@@ -1,9 +1,9 @@
 const cheerio = require("cheerio");
 const request = require("request");
+const db = require("../models");
 
-module.exports = (app, db) => {
+module.exports = (app) => {
 
-  //CREATE: scraping articles and adding them to the DB
   app.get("/scrape", (req, res) => {
     request('https://www.wsj.com/', function (error, response, html) {
       if (error) {
@@ -13,19 +13,26 @@ module.exports = (app, db) => {
         $(".frontpage").find("h3").each(function (i, el) {
           var headline = $(this).text();
           var link = $(this).children().attr("href");
+          //if we have both headline and a link:
           if (link && headline) {
+            //crearte article oblject
             var article = {
               headline: headline,
               link: link
             }
-            //will want function to add article class to mongo
-            console.log(article);
+            //then add article obj to DB
+            db.Article.create(article)
+            .then(function(article) {
+              console.log(article);
+            })
+            .catch(function(err) {
+              return res.json(err);
+            })
           }
-
         })
       }
     });
-    res.send("hello api scrape route");
+    res.send("website scraped");
   })
 
 
