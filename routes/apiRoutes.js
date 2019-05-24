@@ -4,11 +4,23 @@ const request = require("request");
 module.exports = (app, db) => {
 
     app.get("/scrape", (req, res) => {
-        request('https://www.nationalgeographic.com/latest-stories/', function (error, response, html) {
-            if (!error && response.statusCode == 200) {
+        request('https://www.wsj.com/', function (error, response, html) {
+            if (error) {
+              console.log("We've got a problem: " + error);
+            } else {
                 var $ = cheerio.load(html);
-              var doc = $.html(".lead-component")
-              console.log("count:" + doc +"l")
+                $(".frontpage").find("h3").each(function(i, el) {
+                  var headline = $(this).text();
+                  var link = $(this).children().attr("href");
+                  if(link && headline)  {
+                    var article = {
+                      headline: headline,
+                      link: link
+                    }
+                    console.log(article);
+                  } 
+                  
+                })
             }
           });
         res.send("hello api scrape route");
