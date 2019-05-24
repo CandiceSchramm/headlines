@@ -1,30 +1,39 @@
 const cheerio = require("cheerio");
 const request = require("request");
+const db = require("../models");
 
-module.exports = (app, db) => {
+module.exports = (app) => {
 
-    app.get("/scrape", (req, res) => {
-        request('https://www.wsj.com/', function (error, response, html) {
-            if (error) {
-              console.log("We've got a problem: " + error);
-            } else {
-                var $ = cheerio.load(html);
-                $(".frontpage").find("h3").each(function(i, el) {
-                  var headline = $(this).text();
-                  var link = $(this).children().attr("href");
-                  if(link && headline)  {
-                    var article = {
-                      headline: headline,
-                      link: link
-                    }
-                    console.log(article);
-                  } 
-                  
-                })
+  app.get("/scrape", (req, res) => {
+    request('https://www.wsj.com/', function (error, response, html) {
+      if (error) {
+        console.log("We've got a problem: " + error);
+      } else {
+        var $ = cheerio.load(html);
+        $(".frontpage").find("h3").each(function (i, el) {
+          var headline = $(this).text();
+          var link = $(this).children().attr("href");
+          //if we have both headline and a link:
+          if (link && headline) {
+            //crearte article oblject
+            var article = {
+              headline: headline,
+              link: link
             }
-          });
-        res.send("hello api scrape route");
-    })
+            //then add article obj to DB
+            db.Article.create(article)
+            .then(function(article) {
+              console.log(article);
+            })
+            .catch(function(err) {
+              return res.json(err);
+            })
+          }
+        })
+      }
+    });
+    res.send("website scraped");
+  })
 
 
 }

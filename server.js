@@ -15,7 +15,7 @@ app.use(logger("dev"));
 
 //routes
 require("./routes/htmlRoutes")(app);
-require("./routes/apiRoutes")(app, db);
+require("./routes/apiRoutes")(app);
 
 //public files
 app.use(express.static("public"));
@@ -30,8 +30,7 @@ app.engine(
 app.set("view engine", "handlebars")
 //set up connection to DB
 
-mongoose.connect("mongodb://localhost/natGeoScraper", {useNewUrlParser: true})
-var db = require("./models");
+mongoose.connect("mongodb://localhost/headlines", {useNewUrlParser: true})
 
 
 
