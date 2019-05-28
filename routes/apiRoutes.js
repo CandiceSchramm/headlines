@@ -4,6 +4,7 @@ const db = require("../models");
 
 module.exports = (app) => {
 
+//scrape articles
   app.get("/scrape", (req, res) => {
     request('https://www.wsj.com/', function (error, response, html) {
       if (error) {
@@ -21,7 +22,7 @@ module.exports = (app) => {
               link: link
             }
             //then add article obj to DB
-            db.Article.create(article)
+            db.article.create(article)
             .then(function(article) {
               console.log(article);
             })
@@ -35,5 +36,27 @@ module.exports = (app) => {
     res.send("website scraped");
   })
 
+  //find all articles
+  app.get("/all", (req, res) => {
+    db.Article.find({})
+    .then(function(results) {
+      return res.json(results);
+    })
+    .catch(function(err) {
+      return res.json(err);
+    })
+  })
 
+//find saved articles
+  app.get("/saved", (req, res) => {
+    db.Article.find({"saved": true})
+    .then(function(savedArticles) {
+      res.json(savedArticles);
+    })
+    .catch(function(err) {
+      return res.json(error);
+    })
+  })
 }
+
+
