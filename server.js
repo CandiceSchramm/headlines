@@ -9,7 +9,7 @@ const PORT = 3000;
 
 
 //body-parser set up
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 //set up morgan to log http requests
 app.use(logger("dev"));
 
