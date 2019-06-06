@@ -2,9 +2,11 @@ const cheerio = require("cheerio");
 const request = require("request");
 const db = require("../models");
 
+
+
 module.exports = (app) => {
 
-//scrape articles
+//create articles by scraping
   app.get("/scrape", (req, res) => {
     request('https://www.wsj.com/', function (error, response, html) {
       if (error) {
@@ -51,12 +53,81 @@ module.exports = (app) => {
   app.get("/saved", (req, res) => {
     db.Article.find({"saved": true})
     .then(function(savedArticles) {
-      res.json(savedArticles);
+      return res.json(savedArticles);
     })
     .catch(function(err) {
       return res.json(error);
     })
   })
+
+  //create or update a note
+  app.post("/updateNote/:ArticleId", (req, res) => {
+    db.Note.create({title: req.body.title, body: req.body.body})
+    .then(function(dbNote) {
+      db.Article.findOneAndUpdate({_id: req.params.ArticleId}, {$push: {notes: dbNote._id}}, {new: true, upsert: true})
+    })
+    .then(function(articleWithNote) {
+      return res.json(articleWithNote)
+    })
+    .catch(function(err) {
+      return res.json(err);
+    })
+  })
+
+  //get one note by ID
+  app.get("/note/:noteId", (req, res) => {
+    db.Note.find({_id: req.params.noteId})
+    .then(function(noteFound) {
+      return res.json(noteFound);
+    })
+    .catch(function(err) {
+      return res.json(err);
+    })
+  })
+
+  //get one article with notes populated
+  app.get("article/:id", (req, res) => {
+    db.Article.findOne({_id: req.params.id})
+    .populate("notes")
+    .then(function(articleWithNotes) {
+      return res.json(articleWithNotes)
+    })
+  })
+
+  //get all notes
+  app.get("allNotes", (req, res) => {
+    db.Note.find({})
+    .then(function(notesFound) {
+      return res.json(notesFound);
+    })
+    .catch(function(err) {
+      return res.json(err);
+    })
+  })
+
+  
+  //save an article
+  app.put("saveArticle/:articleId", (req, res) => {
+    db.Article.indByIdAndUpdate({_id: articleId}, {saved: true}, { new: true })
+    .then(function(updatedArticle) {
+      return res.json(updatedArticle);
+    })
+    .catch(function(err) {
+      return res.json(err);
+    })
+  })
+
+  //delete 1 note
+  app.delete("deleteNote/:noteId", (req, res) => {
+    db.Note.findByIdAndDelete({_id: noteId})
+  })
+  .then(function(stuffReturned) {
+    return res.json(stuffReturned);
+  })
+  .catch(function(err) {
+    return res.json(err);
+  })
+
 }
 
 
